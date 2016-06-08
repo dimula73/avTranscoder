@@ -24,6 +24,7 @@ const std::string avProfileCodec = "codec";
 const std::string avProfilePixelFormat = "pix_fmt";
 const std::string avProfileSampleFormat = "sample_fmt";
 const std::string avProfileFrameRate = "r";
+const std::string avProfileBitRate = "bit_rate";
 const std::string avProfileWidth = "width";
 const std::string avProfileHeight = "height";
 const std::string avProfileSampleRate = "ar";

@@ -9,6 +9,16 @@ extern "C" {
 #include <stdexcept>
 #include <cstdlib>
 
+
+template <class T>
+bool from_string(T &t,
+                 const std::string &s,
+                 std::ios_base & (*f)(std::ios_base&))
+{
+   std::istringstream iss(s);
+   return !(iss>>f>>t).fail();
+}
+
 namespace avtranscoder
 {
 
@@ -59,7 +69,7 @@ void VideoEncoder::setupEncoder(const ProfileLoader::Profile& profile)
            (*it).first == constants::avProfileType || (*it).first == constants::avProfileCodec ||
            (*it).first == constants::avProfileWidth || (*it).first == constants::avProfileHeight ||
            (*it).first == constants::avProfilePixelFormat || (*it).first == constants::avProfileFrameRate ||
-           (*it).first == constants::avProfileThreads)
+           (*it).first == constants::avProfileThreads || (*it).first == constants::avProfileBitRate)
             continue;
 
         try
@@ -80,6 +90,17 @@ void VideoEncoder::setupEncoder(const ProfileLoader::Profile& profile)
         encoderFlags |= CODEC_FLAG_PSNR;
     }
     _codec.getAVCodecContext().flags |= encoderFlags;
+
+    if(profile.count(constants::avProfileBitRate)) {
+
+        int64_t bitRate = 0;
+        bool bconvert = from_string<int64_t>(bitRate, profile.at(constants::avProfileBitRate), std::dec);
+
+        if (bconvert) {
+            _codec.getAVCodecContext().bit_rate = bitRate;
+        }
+    }
+
     _codec.openCodec();
 
     // after open encoder, set specific encoder options
@@ -89,7 +110,7 @@ void VideoEncoder::setupEncoder(const ProfileLoader::Profile& profile)
            (*it).first == constants::avProfileType || (*it).first == constants::avProfileCodec ||
            (*it).first == constants::avProfileWidth || (*it).first == constants::avProfileHeight ||
            (*it).first == constants::avProfilePixelFormat || (*it).first == constants::avProfileFrameRate ||
-           (*it).first == constants::avProfileThreads)
+           (*it).first == constants::avProfileThreads || (*it).first == constants::avProfileBitRate)
             continue;
 
         try
